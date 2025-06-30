@@ -16,13 +16,7 @@ services:
     volumes:
       - ./data/chroma_db:/app/chroma_db
       - ./data/processed_texts:/app/processed_texts
-      - ./backend:/app
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   frontend:
     build: 
@@ -36,30 +30,6 @@ services:
       - backend
     restart: unless-stopped
 
-  n8n:
-    image: n8nio/n8n:latest
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD:-admin123}
-      - WEBHOOK_URL=http://localhost:5678
-      - N8N_HOST=localhost
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-    volumes:
-      - ./data/n8n:/home/node/.n8n
-      - ./n8n-workflows:/home/node/workflows
-    restart: unless-stopped
-    depends_on:
-      - backend
-
 volumes:
   chroma_db:
   processed_texts:
-  n8n_data:
-
-networks:
-  default:
-    driver: bridge
